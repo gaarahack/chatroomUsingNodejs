@@ -5,6 +5,12 @@ const socketIo = require('socket.io');
 const multer = require('multer');
 const path = require('path');
 const session = require('express-session');
+const cors = require('cors');
+const corsConfig = {
+  origin: "*",
+  credential: true,
+  methods:["GET","POST","PUT","DELETE"],
+};
 
 const app = express();
 const server = http.createServer(app);
@@ -15,7 +21,8 @@ const activeRooms = {};
 const blockedUsers = new Set();
 const MODERATOR_PASSWORD = 'lit3x7';
 
-
+aap.options("",cors(corsConfig));
+app.use(cors(corsConfig));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
