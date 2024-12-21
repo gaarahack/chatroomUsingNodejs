@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderator Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+            background-image: url("https://images.alphacoders.com/114/1144589.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: #9AC8CD;
+        }
+
+        nav {
+            background: rgba(0, 0, 0, 0.7);
+            width: 100%;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        nav h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        nav a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+        .page {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 1rem;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            border: 2px solid #4CAF50;
+            color: #9AC8CD;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .container h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .container form input[type="text"] {
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            background-color: #111;
+            color: #9AC8CD;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .container form input[type="submit"] {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: #111;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .container ul {
+            list-style-type: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .container ul li {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            nav h1 {
+                font-size: 1.5rem;
+            }
+
+            nav a {
+                font-size: 1rem;
+            }
+
+            .container h2 {
+                font-size: 1.2rem;
+            }
+
+            .container form input[type="text"] {
+                font-size: 0.9rem;
+            }
+
+            .container form input[type="submit"] {
+                font-size: 0.9rem;
+            }
+
+            .container ul li {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <h1>Moderator Dashboard</h1>
+        <a href="/logout">Logout</a>
+    </nav>
+    <div class="page">
+        <div class="container">
+            <h2>Block User</h2>
+            <form action="/block_user" method="post">
+                <input type="text" name="username" placeholder="Enter username to block" required>
+                <input type="submit" value="Block">
+            </form>
+        </div>
+        <div class="container">
+            <h2>Join Room</h2>
+            <form action="/join_room" method="post">
+                <input type="text" name="room" placeholder="Enter room name" required>
+                <input type="submit" value="Join">
+            </form>
+        </div>
+        <div class="container">
+            <h2>Active Rooms</h2>
+            <ul>
+                {% for room, users in rooms.items() %}
+                <li>{{ room }}: {{ users }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="container">
+            <h2>Blocked Users</h2>
+            <ul>
+                {% for user in blocked_users %}
+                <li>{{ user }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-image: url(https://wallpapers.com/images/hd/world-map-cyber-security-ivcowv89j1g1ff4m.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: #0F0;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #9AC8CD;
+            backdrop-filter: blur(5px);
+        }
+
+        #chat-box {
+            margin: 20px;
+            padding: 10px;
+            max-height: 60vh;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            width: 80%;
+            border-radius: 5px;
+        }
+
+        .message {
+            margin: 10px 0;
+            text-align: left;
+            color: #9AC8CD;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            background-color: #111;
+            color: #9AC8CD;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        input[type="file"] {
+            background-color: #111;
+            color: #9AC8CD;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Private Room</h1>
+
+    <div id="chat-box"></div>
+
+    <input type="text" id="message-input" placeholder="Type your message..." onkeydown="handleKeyDown(event)" />
+    <button onclick="sendMessage()">Send Message</button>
+
+    <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png,.docx,.txt,.zip,.pptx" />
+    <button onclick="sendFile()">Send File</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const roomId = '<%= roomId %>'; 
+        const username = '<%= username %>';
+
+        const socket = io.connect('http://localhost');
+
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter') {
+                sendMessage(); 
+            }
+        }
+
+   
+        function sendMessage() {
+            const message = document.getElementById('message-input').value;
+            if (message.trim() !== '') {
+                socket.emit('message', { username, room_id: roomId, message });
+                document.getElementById('message-input').value = ''; 
+            }
+        }
+
+        // Function to send a file
+        function sendFile() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Upload file to the server
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    socket.emit('sendFile', {
+                        username,
+                        room_id: roomId,
+                        filePath: data.url,
+                        fileName: file.name
+                    });
+                })
+                .catch(error => console.error('Error uploading file:', error));
+            } else {
+                alert('Please select a file to upload.');
+            }
+        }
+
+        // Listen for incoming messages (including files)
+        socket.on('message', (data) => {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            if (data.filePath) {
+                // Handle file message display
+                messageDiv.innerHTML = `<strong>${data.username}:</strong> <a href="${data.filePath}" target="_blank">${data.fileName}</a>`;
+            } else {
+                // Handle regular text message display
+                messageDiv.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+            }
+            document.getElementById('chat-box').appendChild(messageDiv);
+        });
+
+        // Join the room when the page loads
+        socket.emit('join', { username, room_id: roomId });
+    </script>
+</body>
+</html>
